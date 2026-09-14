@@ -1,0 +1,413 @@
+[
+  {
+    "id": "linux-tools",
+    "name": "Linux 基础工具",
+    "category": "文件、文本与版本管理",
+    "stage": "基础必修",
+    "summary": "认识系统、编辑文件、查询帮助和管理软件。",
+    "scope": "第1周课程容器；本机安装时在个人终端执行sudo。",
+    "source": "https://documentation.ubuntu.com/server/how-to/software/package-management/",
+    "license": "使用开源发行版；再分发保留各工具原始许可证和第三方声明。",
+    "resource": "基础镜像内预装常用工具；tree作为真实安装练习。",
+    "steps": [
+      {
+        "title": "识别发行版与目录",
+        "explanation": "先确认操作对象。容器uname共享宿主内核，发行版以os-release为准。",
+        "command": "cat /etc/os-release\nwhoami\npwd",
+        "expected": "Ubuntu 24.04、student、/workspace。",
+        "troubleshooting": "先读最后一条错误，核对执行位置、软件版本和路径；不要重复执行不理解的管理员命令。"
+      },
+      {
+        "title": "了解软件索引",
+        "explanation": "apt-get update刷新索引，不等同升级全部软件。本周使用已准备的本地APT仓库。",
+        "command": "sudo apt-get update",
+        "expected": "软件索引读取成功。",
+        "troubleshooting": "如果找不到/opt/apt-repo，请重新准备课程镜像。"
+      },
+      {
+        "title": "安装并验证tree",
+        "explanation": "只在第1周管理员课程环境执行。宿主机与容器的软件安装相互独立。",
+        "command": "sudo apt-get install -y tree\ntree --version\ndpkg-query -W tree",
+        "expected": "tree真实安装并显示版本。",
+        "troubleshooting": "先读最后一条错误，核对执行位置、软件版本和路径；不要重复执行不理解的管理员命令。"
+      },
+      {
+        "title": "查看帮助与文件归属",
+        "explanation": "学会自己查参数，避免机械复制。",
+        "command": "tree --help\ndpkg -L tree\nls -l /workspace",
+        "expected": "知道程序位置与目录权限。",
+        "troubleshooting": "先读最后一条错误，核对执行位置、软件版本和路径；不要重复执行不理解的管理员命令。"
+      }
+    ],
+    "verify": "command -v bash nano git tree\ntree --version",
+    "uninstall": "sudo apt-get remove tree",
+    "notes": [
+      "课程普通周不提供管理员权限。不要使用chmod 777修复未知权限问题。"
+    ]
+  },
+  {
+    "id": "python",
+    "name": "Python 科学计算与控制",
+    "category": "数值计算与绘图",
+    "stage": "基础必修",
+    "summary": "NumPy、SciPy、Matplotlib、python-control，用于电机分析和独立对照。",
+    "scope": "/workspace/.venv；避免改动系统Python。",
+    "source": "https://python-control.readthedocs.io/en/stable/intro.html",
+    "license": "使用开源发行版；再分发保留各工具原始许可证和第三方声明。",
+    "resource": "使用适配Python3.12的二进制wheels；不安装完整Conda或Slycot。",
+    "steps": [
+      {
+        "title": "创建隔离环境",
+        "explanation": "每个工程维护独立依赖。课程已经提供python3-venv。",
+        "command": "python3 -m venv .venv\n.venv/bin/python --version",
+        "expected": "Python 3.12环境可用。",
+        "troubleshooting": "宿主机缺venv时，先在宿主终端sudo apt-get install python3-venv。"
+      },
+      {
+        "title": "从课堂缓存安装",
+        "explanation": "固定版本清单在镜像内。--no-index防止课堂临时依赖互联网。",
+        "command": ".venv/bin/python -m pip install --no-index --find-links=/opt/wheels -r /opt/course/science-requirements.txt",
+        "expected": "四个库及依赖安装成功。",
+        "troubleshooting": "没有匹配wheel时检查Python版本与CPU架构，不要修改系统Python。"
+      },
+      {
+        "title": "实际导入并记录版本",
+        "explanation": "版本文件比截图更适合复现。",
+        "command": ".venv/bin/python -c \"import sys,numpy,scipy,matplotlib,control; print(sys.version,sys.prefix); print(numpy.__version__,scipy.__version__,matplotlib.__version__,control.__version__)\"",
+        "expected": "解释器前缀为项目.venv，四库导入成功。",
+        "troubleshooting": "先读最后一条错误，核对执行位置、软件版本和路径；不要重复执行不理解的管理员命令。"
+      },
+      {
+        "title": "运行一个实际算例",
+        "explanation": "labtool的基础求解器无需第三方库；独立科学计算对照会明确检查已安装依赖。",
+        "command": "labtool simulate --voltage 12 --output results/openloop.csv\n.venv/bin/python /opt/course/science_check.py",
+        "expected": "得到真实数值结果和独立对照误差。",
+        "troubleshooting": "先读最后一条错误，核对执行位置、软件版本和路径；不要重复执行不理解的管理员命令。"
+      }
+    ],
+    "verify": ".venv/bin/python -m pip check\n.venv/bin/python /opt/course/science_check.py",
+    "uninstall": "# 确认pwd为/workspace且不需要此环境后\nrm -rf -- .venv",
+    "notes": [
+      "正常联网的宿主项目可用pip按相同版本清单安装；不要sudo pip。",
+      "清理只删除当前项目虚拟环境，不删除系统Python。"
+    ]
+  },
+  {
+    "id": "remote",
+    "name": "OpenSSH · rsync · tmux",
+    "category": "远程计算",
+    "stage": "基础必修",
+    "summary": "密钥认证、同步结果、保留远程终端会话。",
+    "scope": "第4周主容器与workstation辅助容器，内部网络。",
+    "source": "https://www.openssh.com/manual.html",
+    "license": "使用开源发行版；再分发保留各工具原始许可证和第三方声明。",
+    "resource": "两个轻量容器；不对宿主发布SSH端口。",
+    "steps": [
+      {
+        "title": "确认工具",
+        "explanation": "基础镜像已经准备客户端；安装是镜像准备阶段真实完成的。",
+        "command": "ssh -V\nrsync --version\ntmux -V",
+        "expected": "三个工具可用。",
+        "troubleshooting": "先读最后一条错误，核对执行位置、软件版本和路径；不要重复执行不理解的管理员命令。"
+      },
+      {
+        "title": "核对主机与创建密钥",
+        "explanation": "以页面显示的可信SSH指纹核对workstation。课堂初始口令仅为linuxlab。",
+        "command": "test -f ~/.ssh/id_ed25519 || ssh-keygen -t ed25519 -N \"\" -f ~/.ssh/id_ed25519\nchmod 600 ~/.ssh/id_ed25519\nssh-copy-id student@workstation",
+        "expected": "完成主机身份核对和公钥安装。",
+        "troubleshooting": "不要覆盖已有私钥，不关闭主机指纹检查。"
+      },
+      {
+        "title": "测试连接与文件同步",
+        "explanation": "先认证，再处理文件路径。",
+        "command": "ssh -o BatchMode=yes student@workstation hostname\nssh student@workstation \"mkdir -p jobs/motor\"\nrsync -av config student@workstation:jobs/motor/",
+        "expected": "hostname为workstation，配置成功同步。",
+        "troubleshooting": "先读最后一条错误，核对执行位置、软件版本和路径；不要重复执行不理解的管理员命令。"
+      }
+    ],
+    "verify": "ssh -o BatchMode=yes student@workstation hostname",
+    "uninstall": "# 使用页面“重置第4周实验”清理专属容器和课堂密钥。",
+    "notes": [
+      "课程口令只属于隔离辅助机。真实服务器遵守管理员的认证和作业调度规定。"
+    ]
+  },
+  {
+    "id": "cpp",
+    "name": "GCC · CMake · GDB",
+    "category": "编译、测试与调试",
+    "stage": "基础必修",
+    "summary": "使用提供的C++工程定位并修复一个单位换算问题。",
+    "scope": "第5周课程容器。",
+    "source": "https://cmake.org/cmake/help/latest/guide/tutorial/index.html",
+    "license": "使用开源发行版；再分发保留各工具原始许可证和第三方声明。",
+    "resource": "小型C++17工程，默认单线程编译。",
+    "steps": [
+      {
+        "title": "检查工具链",
+        "explanation": "本机安装可用sudo apt-get install build-essential cmake gdb；课程镜像已预装。",
+        "command": "g++ --version\ncmake --version\ngdb --version",
+        "expected": "三个工具都报告版本。",
+        "troubleshooting": "先读最后一条错误，核对执行位置、软件版本和路径；不要重复执行不理解的管理员命令。"
+      },
+      {
+        "title": "配置与编译",
+        "explanation": "Debug保留符号，-j1降低内存占用。",
+        "command": "cmake -S sensor -B sensor/build -DCMAKE_BUILD_TYPE=Debug\ncmake --build sensor/build -j1",
+        "expected": "生成sensor_tool和test_units。",
+        "troubleshooting": "先读最后一条错误，核对执行位置、软件版本和路径；不要重复执行不理解的管理员命令。"
+      },
+      {
+        "title": "运行测试与调试",
+        "explanation": "初始工程故意出错，测试失败是有效的教学证据。",
+        "command": "ctest --test-dir sensor/build --output-on-failure\ngdb -q sensor/build/sensor_tool",
+        "expected": "CTest失败指出单位错误，GDB能加载符号。",
+        "troubleshooting": "若ptrace受限，记录环境异常并检查课堂调试配置，不使用privileged。"
+      }
+    ],
+    "verify": "sensor/build/sensor_tool 10\nctest --test-dir sensor/build --output-on-failure",
+    "uninstall": "# 仅删除可重新生成的构建目录\nrm -rf -- sensor/build",
+    "notes": [
+      "修复前输出600，修复后应约95.492966；代码编译成功不代表物理正确。"
+    ]
+  },
+  {
+    "id": "openmodelica",
+    "name": "OpenModelica · Modelica 标准库",
+    "category": "机电系统仿真",
+    "stage": "基础必修",
+    "summary": "独立的电气—机械组件模型与Python结果对照。",
+    "scope": "第6周专用容器；OMEdit选做在本机桌面运行。",
+    "source": "https://openmodelica.org/download/download-linux/",
+    "license": "使用开源发行版；再分发保留各工具原始许可证和第三方声明。",
+    "resource": "按需下载omc及编译依赖与标准库；先核对实际空间，GUI另行安装。",
+    "steps": [
+      {
+        "title": "准备本周软件包",
+        "explanation": "这一步在宿主机教程项目目录运行。脚本通过官方签名源构建缓存镜像，保留安装日志。",
+        "command": "./scripts/prepare-labs.sh --modelica",
+        "expected": "mechlinux-modelica:1.0镜像准备完成。",
+        "troubleshooting": "空间不足应先腾出空间；基础实验无需等待这一镜像。"
+      },
+      {
+        "title": "在课程容器安装",
+        "explanation": "启动第6周后，从本地APT仓库实际安装编译器与库缓存。",
+        "command": "sudo apt-get update\nsudo apt-get install -y omc omlibrary\nomc --version | tee results/omc-version.txt",
+        "expected": "显示实际omc版本。",
+        "troubleshooting": "先读最后一条错误，核对执行位置、软件版本和路径；不要重复执行不理解的管理员命令。"
+      },
+      {
+        "title": "准备标准库",
+        "explanation": "编译器与库独立检查；Modelica标准库使用课程缓存版本4.0.0。",
+        "command": "omc scripts/prepare_modelica.mos",
+        "expected": "loadModel返回true。",
+        "troubleshooting": "库未找到时检查/opt/modelica目录和MODELICAPATH，而不是伪造安装状态。"
+      },
+      {
+        "title": "运行组件模型",
+        "explanation": "无图形求解器实际编译模型，运行5秒12V无负载算例，再统一字段输出。",
+        "command": "labtool modelica\nlabtool simulate --voltage 12 --output results/openloop.csv\nlabtool compare",
+        "expected": "两份真实CSV和误差报告。",
+        "troubleshooting": "先读最后一条错误，核对执行位置、软件版本和路径；不要重复执行不理解的管理员命令。"
+      }
+    ],
+    "verify": "omc --version\nlabtool modelica\nlabtool compare",
+    "uninstall": "sudo apt-get remove omc omlibrary\n# 项目重置会清除本周安装和作品，先导出。",
+    "notes": [
+      "OMEdit按需通过官方包安装，不是网页内嵌桌面应用。",
+      "首版通过CSV独立对照，不引入FMU联合仿真。",
+      "没有真实执行omc时，平台不得标记对照通过。"
+    ]
+  },
+  {
+    "id": "freecad",
+    "name": "FreeCAD · Gmsh · CalculiX",
+    "category": "CAD 与结构分析",
+    "stage": "方向按需",
+    "summary": "对电机安装支架进行参数建模、小网格线性静力验算。",
+    "scope": "第7–8周规划；本机桌面建模，项目目录交换文件。",
+    "source": "https://www.freecad.org/downloads.php",
+    "license": "使用开源发行版；再分发保留各工具原始许可证和第三方声明。",
+    "resource": "需要图形桌面；小模型起步，不同时加载大型装配。",
+    "steps": [
+      {
+        "title": "获取FreeCAD",
+        "explanation": "从官方站选择Linux稳定AppImage并核对版本与文件名。以下文件名需替换为实际下载名称。",
+        "command": "chmod u+x FreeCAD-实际版本-x86_64.AppImage\n./FreeCAD-实际版本-x86_64.AppImage",
+        "expected": "打开FreeCAD并记录About中的版本。",
+        "troubleshooting": "AppImage需要FUSE时按官方说明补依赖，或使用--appimage-extract解包运行；不要使用虚构文件名。"
+      },
+      {
+        "title": "准备网格和求解器",
+        "explanation": "在Ubuntu24.04宿主终端安装发行版包。",
+        "command": "sudo apt-get update\nsudo apt-get install gmsh calculix-ccx\ncommand -v gmsh ccx",
+        "expected": "两个程序可定位。",
+        "troubleshooting": "先读最后一条错误，核对执行位置、软件版本和路径；不要重复执行不理解的管理员命令。"
+      },
+      {
+        "title": "配置与验证FEM流程",
+        "explanation": "在FreeCAD FEM设置中指定Gmsh和CalculiX路径，不假设AppImage已捆绑它们。",
+        "command": "gmsh --version\nccx -v",
+        "expected": "建立小型悬臂梁，施加载荷与固定约束，求解并与梁理论比较。",
+        "troubleshooting": "先读最后一条错误，核对执行位置、软件版本和路径；不要重复执行不理解的管理员命令。"
+      }
+    ],
+    "verify": "最小算例：小型梁/支架，记录几何、材料、载荷、约束、网格与位移单位。",
+    "uninstall": "# 删除本人下载的AppImage；APT工具按需移除\nsudo apt-get remove gmsh calculix-ccx",
+    "notes": [
+      "这是进阶安装导航，完整专业实验尚未上线。",
+      "开源工具训练通用工程流程，不声称替代特定企业商业软件的全部功能。"
+    ]
+  },
+  {
+    "id": "openfoam",
+    "name": "OpenFOAM 14 · ParaView",
+    "category": "流体计算与后处理",
+    "stage": "方向按需",
+    "summary": "小型冷却管道层流算例、批量求解与结果验证。",
+    "scope": "第9–12周CAE规划；本机求解与桌面后处理。",
+    "source": "https://openfoam.org/download/14-ubuntu/",
+    "license": "使用开源发行版；再分发保留各工具原始许可证和第三方声明。",
+    "resource": "较大安装；使用小网格层流案例，记录质量守恒和网格敏感性。",
+    "steps": [
+      {
+        "title": "选择发行线",
+        "explanation": "统一使用OpenFOAM Foundation 14，按官方Ubuntu安装页配置签名软件源。不要混用其它发行线的命令。",
+        "command": "# 按上方官方安装页配置软件源后执行\nsudo apt-get update\nsudo apt-get install openfoam14",
+        "expected": "Foundation 14安装成功。",
+        "troubleshooting": "先读最后一条错误，核对执行位置、软件版本和路径；不要重复执行不理解的管理员命令。"
+      },
+      {
+        "title": "加载环境",
+        "explanation": "只在当前终端source，先验证后再决定是否写入个人Shell配置。",
+        "command": "source /opt/openfoam14/etc/bashrc\nfoamRun -help",
+        "expected": "求解器帮助可用。",
+        "troubleshooting": "先读最后一条错误，核对执行位置、软件版本和路径；不要重复执行不理解的管理员命令。"
+      },
+      {
+        "title": "验证小型示例",
+        "explanation": "复制官方教程后先生成网格，检查日志再运行求解与后处理。",
+        "command": "mkdir -p \"$FOAM_RUN\"\ncp -r \"$FOAM_TUTORIALS/incompressibleFluid/pitzDailySteady\" \"$FOAM_RUN/\"\ncd \"$FOAM_RUN/pitzDailySteady\"\nblockMesh\nfoamRun\nparaFoam",
+        "expected": "网格、求解日志和结果可用。",
+        "troubleshooting": "复制前确认目标不存在；图形后处理在桌面运行。"
+      }
+    ],
+    "verify": "检查网格、收敛历史、质量守恒和解析压降基准。",
+    "uninstall": "sudo apt-get remove openfoam14",
+    "notes": [
+      "完整实验尚未上线；软件可运行不代表数值结果可信。",
+      "ParaView可使用Ubuntu提供版本；需要更新版时从官方站下载匹配Linux二进制并记录版本。"
+    ]
+  },
+  {
+    "id": "ros2",
+    "name": "ROS 2 Jazzy · Gazebo Harmonic",
+    "category": "机器人与虚拟控制",
+    "stage": "方向按需",
+    "summary": "从单关节到差速机器人，连接控制框架和物理仿真。",
+    "scope": "第7–12周机器人规划；Ubuntu24.04。",
+    "source": "https://docs.ros.org/en/jazzy/Installation/Ubuntu-Install-Debs.html",
+    "license": "使用开源发行版；再分发保留各工具原始许可证和第三方声明。",
+    "resource": "需要更多磁盘与图形资源；先单关节/低频传感器或无GUI求解。",
+    "steps": [
+      {
+        "title": "准备官方ROS源",
+        "explanation": "依官方安装页配置UTF-8 locale、Universe与ros2-apt-source签名源；本步骤不使用其它版本的源。",
+        "command": "locale\ncat /etc/os-release",
+        "expected": "UTF-8与Ubuntu24.04。",
+        "troubleshooting": "先读最后一条错误，核对执行位置、软件版本和路径；不要重复执行不理解的管理员命令。"
+      },
+      {
+        "title": "安装匹配组件",
+        "explanation": "源配置完成后安装Jazzy以及官方配对的Gazebo供应包。",
+        "command": "sudo apt-get update\nsudo apt-get install ros-jazzy-desktop ros-jazzy-ros-gz ros-jazzy-ros2-control ros-jazzy-ros2-controllers ros-jazzy-gz-ros2-control",
+        "expected": "Jazzy与Harmonic相关包安装成功。",
+        "troubleshooting": "先读最后一条错误，核对执行位置、软件版本和路径；不要重复执行不理解的管理员命令。"
+      },
+      {
+        "title": "验证通信",
+        "explanation": "分别在两个终端加载同一环境并运行示例。",
+        "command": "source /opt/ros/jazzy/setup.bash\nros2 run demo_nodes_cpp talker\n# 第二终端加载同一环境后：\nros2 run demo_nodes_py listener",
+        "expected": "listener收到talker消息；再做单关节仿真。",
+        "troubleshooting": "先读最后一条错误，核对执行位置、软件版本和路径；不要重复执行不理解的管理员命令。"
+      }
+    ],
+    "verify": "验证ros2节点通信与gz_ros2_control单关节示例，保存版本及启动日志。",
+    "uninstall": "# 按官方卸载章节逐项处理，先备份自己的工作空间。",
+    "notes": [
+      "mock组件只用于接口联调，不证明电机电流或负载响应。",
+      "Gazebo关节模型不会自动包含电气驱动器、热模型或实机实时性。"
+    ]
+  },
+  {
+    "id": "industrial",
+    "name": "Mosquitto · PyModbus",
+    "category": "工业通信与虚拟设备",
+    "stage": "方向按需",
+    "summary": "将虚拟电机接到寄存器与消息接口，测试断连、超时和恢复。",
+    "scope": "第7–12周工业设备规划；先仅本机或隔离网络。",
+    "source": "https://mosquitto.org/download/",
+    "license": "使用开源发行版；再分发保留各工具原始许可证和第三方声明。",
+    "resource": "轻量无GUI服务，默认不向公网暴露端口。",
+    "steps": [
+      {
+        "title": "安装消息代理",
+        "explanation": "宿主安装服务会改变本机服务状态，先了解监听范围；课堂优先在专用环境操作。",
+        "command": "sudo apt-get install mosquitto mosquitto-clients\nmosquitto -h",
+        "expected": "工具可用。",
+        "troubleshooting": "先读最后一条错误，核对执行位置、软件版本和路径；不要重复执行不理解的管理员命令。"
+      },
+      {
+        "title": "建立协议项目环境",
+        "explanation": "单独venv，安装后固定实际版本。",
+        "command": "python3 -m venv .venv\n.venv/bin/python -m pip install pymodbus\n.venv/bin/python -m pip freeze > requirements.txt",
+        "expected": "pymodbus可导入。",
+        "troubleshooting": "先读最后一条错误，核对执行位置、软件版本和路径；不要重复执行不理解的管理员命令。"
+      },
+      {
+        "title": "验证消息往返",
+        "explanation": "在已启动本地代理的两个终端分别订阅与发布。",
+        "command": "mosquitto_sub -h localhost -t lab/motor/state\n# 另一个终端：\nmosquitto_pub -h localhost -t lab/motor/state -m \"ready\"",
+        "expected": "订阅端收到ready。",
+        "troubleshooting": "先读最后一条错误，核对执行位置、软件版本和路径；不要重复执行不理解的管理员命令。"
+      }
+    ],
+    "verify": "先验证协议往返，再把真实模型的转速/电流接入；记录单位、字节序、超时和恢复行为。",
+    "uninstall": "sudo apt-get remove mosquitto mosquitto-clients\n# 项目venv确认不用后可删除。",
+    "notes": [
+      "协议返回固定假数值只证明通信，不构成机电闭环仿真。",
+      "PyModbus不同版本API可能变化，按已锁定版本的官方文档使用。"
+    ]
+  },
+  {
+    "id": "linuxcnc",
+    "name": "LinuxCNC 仿真",
+    "category": "数控与虚拟轴",
+    "stage": "选修",
+    "summary": "认识G-code、HAL与虚拟数控轴运动。",
+    "scope": "独立Debian虚拟机；不作为Ubuntu24.04基础必装。",
+    "source": "https://linuxcnc.org/docs/html/getting-started/getting-linuxcnc.html",
+    "license": "使用开源发行版；再分发保留各工具原始许可证和第三方声明。",
+    "resource": "额外虚拟机磁盘与桌面资源；没有硬件时只用仿真配置。",
+    "steps": [
+      {
+        "title": "选择官方仿真环境",
+        "explanation": "通过官方支持的Debian安装路线准备隔离虚拟机，不替换当前学生操作系统。",
+        "command": "# 在独立虚拟机按官方安装说明准备 linuxcnc-uspace\nlinuxcnc",
+        "expected": "配置选择器可打开。",
+        "troubleshooting": "先读最后一条错误，核对执行位置、软件版本和路径；不要重复执行不理解的管理员命令。"
+      },
+      {
+        "title": "打开sim配置",
+        "explanation": "选择自带sim示例，观察坐标、轴与G-code；记录命令与虚拟位置。",
+        "command": "# 在配置选择器选择sim示例，不选择真实机床驱动配置。",
+        "expected": "虚拟轴随示例程序运动。",
+        "troubleshooting": "先读最后一条错误，核对执行位置、软件版本和路径；不要重复执行不理解的管理员命令。"
+      }
+    ],
+    "verify": "验证虚拟坐标、限位和HAL信号逻辑，说明没有实机与实时性验证。",
+    "uninstall": "# 备份项目后删除专用虚拟机即可；不改动主系统内核。",
+    "notes": [
+      "普通内核可做仿真；实机控制需要适合的实时内核与硬件。"
+    ]
+  }
+]

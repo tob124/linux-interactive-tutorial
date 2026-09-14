@@ -1,0 +1,10 @@
+.venv/
+.state/
+__pycache__/
+*.pyc
+.sites-runtime/
+.pytest_cache/
+*.log
+
+# 本机 DSH 工具配置与运行状态
+.dsh/

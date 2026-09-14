@@ -1,0 +1,14 @@
+// Run from the asset directory: omc run.mos
+// Requires OpenModelica and Modelica Standard Library 4.0.0.
+// This file has NOT been claimed to have run unless real omc output is recorded.
+// CSV may include extra event rows; compare matching post-event timestamps.
+loadModel(Modelica, {"4.0.0"});
+getErrorString();
+loadFile("models/Motor.mo");
+getErrorString();
+checkModel(Motor);
+getErrorString();
+simulate(Motor, startTime=0, stopTime=5, numberOfIntervals=1000,
+  tolerance=1e-8, method="dassl", outputFormat="csv",
+  fileNamePrefix="Motor_open");
+getErrorString();

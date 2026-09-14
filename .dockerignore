@@ -1,0 +1,5 @@
+*
+!lab/
+!lab/**
+!server/
+!server/motor.py

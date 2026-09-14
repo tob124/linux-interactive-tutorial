@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="面向机械研一新生的 Linux 项目式交互教程：真实终端、软件安装与虚拟电机调试。作者 Connor He 和 Astra。">
+  <title>机研 Linux · 工程实践教室</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%232b4acb'/%3E%3Cpath d='m10 12 8 8-8 8m12 0h8' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/vendor/xterm.css">
+  <script defer src="/vendor/xterm.js"></script><script defer src="/vendor/addon-fit.js"></script>
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="#learn"><span class="brand-mark" aria-hidden="true">&gt;_</span><span>机研 Linux<small>工程实践教室</small></span></a>
+    <div class="cohort">华南理工大学 · 机械研一</div>
+    <nav class="main-nav" aria-label="主要导航">
+      <button data-view="learn" class="active"><span>▤</span> 项目课程</button>
+      <button data-view="motor"><span>∿</span> 虚拟电机实验台</button>
+      <button data-view="software"><span>⊞</span> 软件与环境</button>
+      <button data-view="tracks"><span>⑂</span> 专业进阶路线</button>
+      <button data-view="portfolio"><span>▧</span> 学习与作品</button>
+    </nav>
+    <div class="nav-caption">共同基础 <span>01 — 06 周</span></div>
+    <nav id="course-nav" class="course-nav" aria-label="课程目录"><button class="week-link active">01 <span>建立实验工作站</span></button></nav>
+    <div class="sidebar-bottom"><div class="progress-line"><span>基础学习进度</span><strong id="progress-label">0 / 24</strong></div><progress id="overall-progress" max="24" value="0" aria-label="基础课程完成数"></progress><p>作者：Connor He 和 Astra</p><small>从第一个命令，到可复现的工程项目。</small></div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><button class="menu-toggle" aria-label="展开课程导航">☰</button><div id="breadcrumb">项目课程 <span>/</span> 共同基础</div><button class="environment-pill" id="environment-button"><span class="status-dot"></span><span id="environment-label">检查本机环境</span></button></header>
+    <div id="view-root" tabindex="-1">
+      <section class="lesson-heading"><div class="eyebrow">PROJECT 01 <span>共同基础 · 第 1 周</span></div><h1>从这里认识 Linux</h1><p>让计算机成为你的工程工具：管理实验数据、运行模型、追踪每一次修改。</p><div class="lesson-meta"><span>01 / 04 单元</span><span>约 35 分钟</span><span>零基础</span></div></section>
+      <div class="learning-grid"><article class="lesson-body"><div class="section-index">01 <span>认识你的实验工作站</span></div><h2>机械研究为什么会用到 Linux？</h2><p>当你需要连续运行一百组电机参数、连接实验室计算服务器，或者为机器人启动控制程序时，Linux 可以把这些工作串成清晰、可重复的流程。这门课将从文件和终端开始，逐步建立一个无需硬件的虚拟电机实验台。</p><div class="concept-grid"><div><b>操作系统</b><p>管理文件、程序和计算资源。Ubuntu 是本课程使用的 Linux 发行版。</p></div><div><b>终端与 Shell</b><p>终端接收你的输入；Shell 解释命令。每次运行前，都先确认自己在哪台机器、哪个目录。</p></div></div><div class="learning-note"><b>本课目标</b><p>分清宿主机与实验环境，读懂命令提示符，找到你的项目工作目录。</p></div><h2>先观察，再操作</h2><p>环境准备完成后，在右侧真实终端输入 <code>pwd</code>，查看当前目录；再使用 <code>ls</code> 观察文件。命令的输出来自实验环境，课程不会代替你伪造执行结果。</p></article><aside class="lab-panel"><div class="panel-title"><span>实践工作区</span><span class="tag">真实 Linux</span></div><div class="terminal-toolbar"><span>student · /workspace</span><span>Bash</span></div><div class="terminal-empty"><span class="terminal-symbol">&gt;_</span><h3>准备你的实验环境</h3><p>在隔离的 Linux 环境中练习，文件操作仅影响课程实验。</p><button class="primary" data-view="software">查看环境准备</button></div><div class="lab-help">每个项目都可重新开始，实验结果可以导出保存。</div></aside></div>
+    </div>
+    <footer>机研 Linux · 项目式工程训练 <span>作者：Connor He 和 Astra</span></footer>
+  </main>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <dialog id="confirm-dialog"><h2 id="confirm-title">确认操作</h2><p id="confirm-message"></p><div class="button-row"><button id="confirm-cancel" class="secondary">取消</button><button id="confirm-ok" class="danger">确认</button></div></dialog>
+</body></html>
