@@ -4,6 +4,7 @@ This does not replace Docker, SSH, GDB or OpenModelica end-to-end acceptance.
 """
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -56,6 +57,33 @@ class CourseTests(unittest.TestCase):
                 self.assertTrue(0 <= q['answer'] < 4)
         for track in COURSE['tracks']:
             self.assertTrue(set(track['softwareIds']) <= ids)
+
+    def test_all_lesson_commands_parse_as_bash(self):
+        for lesson in COURSE['lessons']:
+            for command in [c['command'] for c in lesson['commands']] + [lesson['tasks'][0]['solution']]:
+                with self.subTest(lesson=lesson['id']):
+                    result = self.command('bash', '-n', '-c', command)
+                    self.assertEqual(result.returncode, 0, result.stderr)
+
+    @unittest.skipUnless(shutil.which('g++'), 'C++ compiler unavailable')
+    def test_cpp_defect_and_corrected_units(self):
+        # Compiler-only verification; container CMake/GDB still need acceptance.
+        work = self.work / 'cpp'
+        seed(work, 5)
+        sensor = work / 'sensor'
+        executable = sensor / 'test_units'
+        def compile_test():
+            result = self.command('g++', '-std=c++17', '-I', str(sensor / 'include'),
+                                  str(sensor / 'tests/test_units.cpp'), '-o', str(executable))
+            self.assertEqual(result.returncode, 0, result.stderr)
+        compile_test()
+        result = self.command(str(executable))
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('actual=600', result.stderr)
+        header = sensor / 'include/units.hpp'
+        header.write_text(header.read_text().replace('x * 60.0', 'x * 60.0 / (2 * 3.141592653589793)'))
+        compile_test()
+        self.assertEqual(self.command(str(executable)).returncode, 0)
 
     def test_file_and_data_reference_solutions(self):
         for identifier in ('w1-1', 'w1-2', 'w1-3', 'w2-1', 'w2-2', 'w2-3', 'w2-4'):

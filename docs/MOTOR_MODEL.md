@@ -64,6 +64,8 @@ rpm 一直来自物理状态。两条曲线应同时展示，避免把反馈看�
 
 安装 OpenModelica 与 Modelica Standard Library 4.0.0 后，在 lab/models 目录执行独立带负载算例：
 
+课堂缓存同时保留 Modelica、ModelicaServices 和独立的 [Complex 4.0.0](https://github.com/modelica/ModelicaStandardLibrary/blob/v4.0.0/Complex.mo)，避免离线加载标准库时缺少依赖。
+
     omc run.mos
 
 默认生成 Motor_open_res.csv，对照 simulate({"mode":"open"})。
@@ -75,8 +77,9 @@ applied_voltage、electromagnetic_torque、load。
 Modelica CSV 可能包含事件前后重复时刻，比较物理状态时先统一输出时刻；
 电压和负载按右连续输入解释。状态在理想负载阶跃时保持连续。
 
-本次只完成 Python 实际测试。当前环境未找到 omc、SciPy 或 python-control；
-不应将这些对照资产说成已通过第三方求解器或 OpenModelica 验证。
+Python 物理测试与课程容器中的 SciPy / python-control 开环交叉对照已通过。
+OpenModelica 使用独立组件模型，需以第 6 周真实运行的 comparison.json 为准，
+不能把网页求解器的通过状态代替 OpenModelica 验证。
 
 ## 教学边界
 

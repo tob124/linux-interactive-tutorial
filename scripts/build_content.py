@@ -155,8 +155,8 @@ L(6,1,'安装专业机电仿真工具','使用OpenModelica运行独立的机电�
 'OpenModelica使用Modelica描述方程与组件连接，适合电气和机械耦合系统。omc是命令行编译器，OMEdit是图形编辑器；本课先安装无图形版本，减少环境负担。编译器和Modelica标准库是两项不同依赖，只有omc --version成功还不能证明模型可以加载。',
 '先在本机按软件准备页运行prepare-labs.sh --modelica，下载本周专用包缓存，然后启动第6周。容器内从课堂仓库安装omc和omlibrary，加载已缓存标准库4.0.0，再编译提供的Motor.mo。电阻、电感、机电耦合、惯量和阻尼组成独立的开环模型。',
 '软件包准备可能占用较多磁盘，先检查空间，不要同时安装全部专业工具。加载失败时分别检查编译器、标准库版本和模型路径。课堂不把未运行的模型显示为验证通过。图形拖拽建模可在后续OMEdit中练习，本课重点是从Linux命令行得到可检查的物理结果。',
-[('sudo apt-get update\nsudo apt-get install -y omc omlibrary\nomc --version | tee results/omc-version.txt','只在第6周管理员容器安装已准备的包。','omc报告真实版本。'),('omc scripts/prepare_modelica.mos','将本地缓存中的Modelica库准备好。','loadModel返回true。'),('labtool modelica','编译组件模型并标准化导出CSV。','results/modelica.csv来自真实omc运行。')],
-'完成omc与标准库安装并运行独立电机模型。','sudo apt-get update\nsudo apt-get install -y omc omlibrary\nomc --version > results/omc-version.txt\nomc scripts/prepare_modelica.mos\nlabtool modelica',
+[('sudo apt-get update\nsudo apt-get install -y --no-install-recommends omc omlibrary\nomc --version | tee results/omc-version.txt','只在第6周管理员容器安装已准备的包。','omc报告真实版本。'),('omc scripts/prepare_modelica.mos','将本地缓存中的Modelica库准备好。','loadModel返回true。'),('labtool modelica','编译组件模型并标准化导出CSV。','results/modelica.csv来自真实omc运行。')],
+'完成omc与标准库安装并运行独立电机模型。','sudo apt-get update\nsudo apt-get install -y --no-install-recommends omc omlibrary\nomc --version > results/omc-version.txt\nomc scripts/prepare_modelica.mos\nlabtool modelica',
 [('omc和OMEdit的关系是什么？','分别是编译器与图形编辑器','两个电机参数','两种电流单位','两台服务器'),('版本命令成功是否足够验证模型？','不够，还要加载库并运行模型','足够验证全部物理结果','只需要截图','不需要模型文件')],['openmodelica'])
 L(6,2,'让两套模型互相校验','对齐参数、初值、激励和时间轴后比较结果。',
 '两个工具画出的曲线接近，可以帮助发现实现错误，但不能替代实机验证。对照前必须一致：电机参数、初始电流与转速、输入12V、无负载、仿真5秒。若一边使用rpm而另一边使用rad/s，直接比较数字会得出错误结论。',

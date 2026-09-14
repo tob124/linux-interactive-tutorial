@@ -3,8 +3,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y ca-certificates curl gnupg dpkg-dev
 RUN curl -fsSL https://build.openmodelica.org/apt/openmodelica.asc | gpg --dearmor -o /usr/share/keyrings/openmodelica.gpg && echo 'deb [signed-by=/usr/share/keyrings/openmodelica.gpg] https://build.openmodelica.org/apt noble stable' > /etc/apt/sources.list.d/openmodelica.list && apt-get update
 # Download the full dependency closure against an empty dpkg status file.
-RUN mkdir -p /packages/partial && touch /tmp/empty-status && apt-get -y --download-only -o Dir::State::status=/tmp/empty-status -o Dir::Cache::archives=/packages install omc omlibrary && cd /packages && dpkg-scanpackages . /dev/null > Packages
+RUN mkdir -p /packages/partial && touch /tmp/empty-status && apt-get -y --no-install-recommends --download-only -o Dir::State::status=/tmp/empty-status -o Dir::Cache::archives=/packages install omc omlibrary && cd /packages && dpkg-scanpackages . /dev/null > Packages
 RUN curl -fL https://github.com/modelica/ModelicaStandardLibrary/archive/refs/tags/v4.0.0.tar.gz -o /tmp/msl.tar.gz && mkdir /modelica && tar -xzf /tmp/msl.tar.gz -C /tmp && mv /tmp/ModelicaStandardLibrary-4.0.0/Modelica /modelica/ && mv /tmp/ModelicaStandardLibrary-4.0.0/ModelicaServices /modelica/ && test -f /modelica/Modelica/package.mo
+RUN cp /tmp/ModelicaStandardLibrary-4.0.0/Complex.mo /modelica/ && for doc in LICENSE LICENSE.txt COPYING; do if [ -f "/tmp/ModelicaStandardLibrary-4.0.0/$doc" ]; then cp "/tmp/ModelicaStandardLibrary-4.0.0/$doc" /modelica/; fi; done
 FROM mechlinux-base:1.0
 COPY --from=packages /packages /opt/apt-repo
 COPY --from=packages /modelica /opt/modelica

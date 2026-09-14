@@ -33,7 +33,7 @@ step('运行测试与调试','初始工程故意出错，测试失败是有效�
 '# 仅删除可重新生成的构建目录\nrm -rf -- sensor/build',['修复前输出600，修复后应约95.492966；代码编译成功不代表物理正确。'])
 add('openmodelica','OpenModelica · Modelica 标准库','机电系统仿真','基础必修','独立的电气—机械组件模型与Python结果对照。','第6周专用容器；OMEdit选做在本机桌面运行。','https://openmodelica.org/download/download-linux/','按需下载omc及编译依赖与标准库；先核对实际空间，GUI另行安装。',[
 step('准备本周软件包','这一步在宿主机教程项目目录运行。脚本通过官方签名源构建缓存镜像，保留安装日志。','./scripts/prepare-labs.sh --modelica','mechlinux-modelica:1.0镜像准备完成。','空间不足应先腾出空间；基础实验无需等待这一镜像。'),
-step('在课程容器安装','启动第6周后，从本地APT仓库实际安装编译器与库缓存。','sudo apt-get update\nsudo apt-get install -y omc omlibrary\nomc --version | tee results/omc-version.txt','显示实际omc版本。'),
+step('在课程容器安装','启动第6周后，从本地APT仓库实际安装编译器与库缓存。','sudo apt-get update\nsudo apt-get install -y --no-install-recommends omc omlibrary\nomc --version | tee results/omc-version.txt','显示实际omc版本。'),
 step('准备标准库','编译器与库独立检查；Modelica标准库使用课程缓存版本4.0.0。','omc scripts/prepare_modelica.mos','loadModel返回true。','库未找到时检查/opt/modelica目录和MODELICAPATH，而不是伪造安装状态。'),
 step('运行组件模型','无图形求解器实际编译模型，运行5秒12V无负载算例，再统一字段输出。','labtool modelica\nlabtool simulate --voltage 12 --output results/openloop.csv\nlabtool compare','两份真实CSV和误差报告。')],
 'omc --version\nlabtool modelica\nlabtool compare',

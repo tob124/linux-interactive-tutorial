@@ -2077,7 +2077,7 @@
       ],
       "commands": [
         {
-          "command": "sudo apt-get update\nsudo apt-get install -y omc omlibrary\nomc --version | tee results/omc-version.txt",
+          "command": "sudo apt-get update\nsudo apt-get install -y --no-install-recommends omc omlibrary\nomc --version | tee results/omc-version.txt",
           "explanation": "只在第6周管理员容器安装已准备的包。",
           "expected": "omc报告真实版本。"
         },
@@ -2103,7 +2103,7 @@
             "先在本机按软件准备页运行prepare-labs.sh --modelica，下载本周专用包缓存，然后启动第6周。容器内从课堂仓库安装omc和omlibrary，加载已缓存标准库4.0.0，再编译提供的Motor.mo。电阻、电感、机电耦合、惯量和阻尼组成独立的开环模型。",
             "对照参考解检查目标文件与输出。允许使用其它能产生同等结果的方法。"
           ],
-          "solution": "sudo apt-get update\nsudo apt-get install -y omc omlibrary\nomc --version > results/omc-version.txt\nomc scripts/prepare_modelica.mos\nlabtool modelica"
+          "solution": "sudo apt-get update\nsudo apt-get install -y --no-install-recommends omc omlibrary\nomc --version > results/omc-version.txt\nomc scripts/prepare_modelica.mos\nlabtool modelica"
         }
       ],
       "quiz": [

@@ -191,7 +191,7 @@
       {
         "title": "在课程容器安装",
         "explanation": "启动第6周后，从本地APT仓库实际安装编译器与库缓存。",
-        "command": "sudo apt-get update\nsudo apt-get install -y omc omlibrary\nomc --version | tee results/omc-version.txt",
+        "command": "sudo apt-get update\nsudo apt-get install -y --no-install-recommends omc omlibrary\nomc --version | tee results/omc-version.txt",
         "expected": "显示实际omc版本。",
         "troubleshooting": "先读最后一条错误，核对执行位置、软件版本和路径；不要重复执行不理解的管理员命令。"
       },

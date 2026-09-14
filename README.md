@@ -89,9 +89,17 @@ python3 -m py_compile server/*.py lab/*.py scripts/*.py
 node --check dist/app.js
 ```
 
-以上自动测试覆盖数值物理、HTTP 权限边界、保存/导出、内容关联和可独立执行的实验参考解。**它们不代表 Docker 构建、SSH、GDB 容器权限或 OpenModelica 已通过完整验收。** 教师应在开班前按教师说明在目标机完成一遍真实实验。
+以上 32 项自动测试覆盖数值物理、HTTP 权限边界、保存/导出、内容关联、命令语法、C++ 单位换算与可独立执行的实验参考解。另提供真实容器验收：
 
-当前开发机的 Docker 安装被自动审批拒绝，尚未执行系统修改，因此真实容器与 OpenModelica 的整体验收待管理员授权后完成。
+```bash
+.venv/bin/python scripts/verify_labs.py --weeks 1 2 3 4 5
+# 准备好 OpenModelica 镜像后：
+.venv/bin/python scripts/verify_labs.py --weeks 6
+```
+
+验收使用独立标记的测试容器，不操作学生项目；正常结束后清理这些容器和卷，报告保存在 `.state/acceptance-report.json`。`--keep-failed` 可在失败时保留测试环境供诊断。脚本通过已知的辅助容器公钥准备 SSH 测试身份；课堂中学生仍需学习交互核对指纹与配置登录。
+
+前五周的 20 个真实实验检查及终端 WebSocket、科学计算交叉对照、导出、停止后恢复已通过。第六周 OpenModelica 验收状态见教师说明及最新报告。开班前仍应在目标教学机器复测。
 
 ## 许可证
 

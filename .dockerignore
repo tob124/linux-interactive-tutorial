@@ -3,3 +3,6 @@
 !lab/**
 !server/
 !server/motor.py
+**/__pycache__/
+**/*.pyc
+lab/Dockerfile*
